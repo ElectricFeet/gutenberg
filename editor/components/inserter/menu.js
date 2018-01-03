@@ -14,7 +14,6 @@ import {
 	isEmpty,
 } from 'lodash';
 import { connect } from 'react-redux';
-import classnames from 'classnames';
 
 /**
  * WordPress dependencies
