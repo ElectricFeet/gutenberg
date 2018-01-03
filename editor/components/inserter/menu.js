@@ -14,6 +14,7 @@ import {
 	isEmpty,
 } from 'lodash';
 import { connect } from 'react-redux';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -38,6 +39,7 @@ import './style.scss';
 import { getBlocks, getRecentlyUsedBlocks, getReusableBlocks } from '../../store/selectors';
 import { fetchReusableBlocks } from '../../store/actions';
 import { default as InserterGroup } from './group';
+import BlockPreview from '../block-preview';
 
 export const searchBlocks = ( blocks, searchTerm ) => {
 	const normalizedSearchTerm = searchTerm.toLowerCase().trim();
@@ -60,6 +62,7 @@ export class InserterMenu extends Component {
 		this.state = {
 			filterValue: '',
 			tab: 'recent',
+			selectedBlock: null,
 		};
 		this.filter = this.filter.bind( this );
 		this.searchBlocks = this.searchBlocks.bind( this );
@@ -70,6 +73,7 @@ export class InserterMenu extends Component {
 
 		this.tabScrollTop = { recent: 0, blocks: 0, embeds: 0 };
 		this.switchTab = this.switchTab.bind( this );
+		this.previewBlock = this.previewBlock.bind( this );
 	}
 
 	componentDidMount() {
@@ -106,6 +110,10 @@ export class InserterMenu extends Component {
 		this.setState( {
 			filterValue: event.target.value,
 		} );
+	}
+
+	previewBlock( block ) {
+		this.setState( { selectedBlock: block } );
 	}
 
 	selectBlock( block ) {
@@ -233,6 +241,7 @@ export class InserterMenu extends Component {
 				labelledBy={ labelledBy }
 				bindReferenceNode={ this.bindReferenceNode }
 				selectBlock={ this.selectBlock }
+				onHover={ this.previewBlock }
 			/>
 		);
 	}
@@ -316,10 +325,13 @@ export class InserterMenu extends Component {
 
 	render() {
 		const { instanceId } = this.props;
+		const { selectedBlock } = this.state;
 		const isSearching = this.state.filterValue;
 
 		return (
-			<TabbableContainer className="editor-inserter__menu" deep
+			<TabbableContainer
+				className="editor-inserter__menu"
+				deep
 				onKeyDown={ this.interceptArrows }
 			>
 				<label htmlFor={ `editor-inserter__search-${ instanceId }` } className="screen-reader-text">
@@ -371,6 +383,7 @@ export class InserterMenu extends Component {
 						{ this.renderCategories( this.getVisibleBlocksByCategory( this.getBlockTypes() ) ) }
 					</div>
 				}
+				{ selectedBlock && <BlockPreview name={ selectedBlock.name } attributes={ selectedBlock.initialAttributes } /> }
 			</TabbableContainer>
 		);
 	}
